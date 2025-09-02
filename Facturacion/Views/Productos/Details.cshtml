@@ -1,0 +1,96 @@
+@model Facturacion.Models.Entities.Producto
+
+@{
+    ViewData["Title"] = "Detalles del Producto";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-box"></i> Detalles del Producto</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Nombre)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <h5 class="text-primary">@Html.DisplayFor(model => model.Nombre)</h5>
+                                </dd>
+                                
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Categoria)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge bg-secondary fs-6">
+                                        <i class="fas fa-tag"></i> @Html.DisplayFor(model => model.Categoria.Nombre)
+                                    </span>
+                                </dd>
+                                
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.PrecioUnitario)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    <h4 class="text-success">
+                                        <i class="fas fa-euro-sign"></i> @Html.DisplayFor(model => model.PrecioUnitario)
+                                    </h4>
+                                </dd>
+                                
+                                <dt class="col-sm-4">
+                                    @Html.DisplayNameFor(model => model.Descripcion)
+                                </dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Descripcion))
+                                    {
+                                        @Html.DisplayFor(model => model.Descripcion)
+                                    }
+                                    else
+                                    {
+                                        <em class="text-muted">Sin descripción</em>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">
+                                        <i class="fas fa-info-circle"></i> Información Adicional
+                                    </h6>
+                                    <p class="mb-2">
+                                        <strong>Categoría:</strong><br>
+                                        @Html.DisplayFor(model => model.Categoria.Nombre)
+                                    </p>
+                                    @if (!string.IsNullOrEmpty(Model.Categoria.Descripcion))
+                                    {
+                                        <p class="mb-0 text-muted small">
+                                            @Html.DisplayFor(model => model.Categoria.Descripcion)
+                                        </p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr />
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Volver a la Lista
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning me-md-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

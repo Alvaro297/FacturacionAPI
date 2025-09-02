@@ -1,0 +1,298 @@
+@model Facturacion.Models.Entities.Factura
+
+@{
+    ViewData["Title"] = "Editar Factura";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-edit"></i> Editar Factura @Model.NumeroFactura</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" id="facturaForm">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        
+                        <!-- Información básica de la factura -->
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="NumeroFactura" class="form-label"></label>
+                                    <input asp-for="NumeroFactura" class="form-control" readonly />
+                                    <span asp-validation-for="NumeroFactura" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="Fecha" class="form-label"></label>
+                                    <input asp-for="Fecha" class="form-control" type="date" />
+                                    <span asp-validation-for="Fecha" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label asp-for="ClienteId" class="form-label">Cliente</label>
+                                    <select asp-for="ClienteId" class="form-select" asp-items="ViewBag.ClienteId">
+                                        <option value="">-- Seleccione un cliente --</option>
+                                    </select>
+                                    <span asp-validation-for="ClienteId" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Productos -->
+                        <div class="card mb-3">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5><i class="fas fa-shopping-cart"></i> Productos/Servicios</h5>
+                                <button type="button" class="btn btn-success btn-sm" onclick="agregarProducto()">
+                                    <i class="fas fa-plus"></i> Agregar Producto
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="productosContainer">
+                                    @for (int i = 0; i < Model.FacturaDetalles.Count; i++)
+                                    {
+                                        var detalle = Model.FacturaDetalles.ElementAt(i);
+                                        <div class="row mb-3 producto-row">
+                                            <div class="col-md-4">
+                                                <select name="ProductoIds" class="form-select" onchange="actualizarPrecio(this, @i)">
+                                                    <option value="">-- Seleccione producto --</option>
+                                                    @foreach (var producto in (List<Facturacion.Models.Entities.Producto>)ViewBag.Productos)
+                                                    {
+                                                        if (producto.Id == detalle.ProductoId)
+                                                        {
+                                                            <option value="@producto.Id" data-precio="@producto.PrecioUnitario" selected>
+                                                                @producto.Nombre (@producto.PrecioUnitario€)
+                                                            </option>
+                                                        }
+                                                        else
+                                                        {
+                                                            <option value="@producto.Id" data-precio="@producto.PrecioUnitario">
+                                                                @producto.Nombre (@producto.PrecioUnitario€)
+                                                            </option>
+                                                        }
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input name="Cantidades" type="number" class="form-control" value="@detalle.Cantidad" min="1" onchange="calcularSubtotal(@i)" />
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input name="PreciosUnitarios" type="number" class="form-control" value="@detalle.PrecioUnitario" step="0.01" min="0" readonly />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control subtotal-producto" readonly value="@detalle.Subtotal.ToString("F2") €" />
+                                            </div>
+                                            <div class="col-md-1">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="eliminarProducto(this)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Configuración de impuestos -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="IVA" class="form-label">IVA (%)</label>
+                                    <input asp-for="IVA" class="form-control" type="number" step="0.01" min="0" max="100" onchange="calcularTotales()" />
+                                    <span asp-validation-for="IVA" class="text-danger"></span>
+                                    <div class="form-text">Dejar en 0 si no aplica IVA</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">IRPF (%)</label>
+                                    <input type="text" class="form-control" value="15.0" readonly />
+                                    <div class="form-text">IRPF fijo del 15% según normativa española</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Información adicional -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="FormaPago" class="form-label"></label>
+                                    <select asp-for="FormaPago" class="form-select">
+                                        <option value="">-- Seleccione forma de pago --</option>
+                                        <option value="Transferencia">Transferencia Bancaria</option>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Tarjeta">Tarjeta</option>
+                                        <option value="Cheque">Cheque</option>
+                                        <option value="Domiciliacion">Domiciliación Bancaria</option>
+                                    </select>
+                                    <span asp-validation-for="FormaPago" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label asp-for="Observaciones" class="form-label"></label>
+                                    <textarea asp-for="Observaciones" class="form-control" rows="2"></textarea>
+                                    <span asp-validation-for="Observaciones" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Totales -->
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <strong>Subtotal: <span id="subtotalDisplay">@Model.Subtotal.ToString("F2") €</span></strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>IRPF (15%): <span id="irpfDisplay">@((Model.Subtotal * (Model.IRPF / 100)).ToString("F2")) €</span></strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <strong>IVA: <span id="ivaDisplay">@((Model.Subtotal * (Model.IVA / 100)).ToString("F2")) €</span></strong>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5 class="text-success">Total: <span id="totalDisplay">@Model.Total.ToString("F2") €</span></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos hidden para totales calculados -->
+                        <input type="hidden" asp-for="Subtotal" id="hiddenSubtotal" />
+                        <input type="hidden" asp-for="Total" id="hiddenTotal" />
+                        <input type="hidden" asp-for="IRPF" value="15.0" />
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-3">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-save"></i> Actualizar Factura
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        let contadorProductos = @Model.FacturaDetalles.Count;
+        const productos = [
+            @if (ViewBag.Productos != null)
+            {
+                var productosLista = (List<Facturacion.Models.Entities.Producto>)ViewBag.Productos;
+                for (int i = 0; i < productosLista.Count; i++)
+                {
+                    var producto = productosLista[i];
+                    @:{Id: @producto.Id, Nombre: "@Html.Raw(producto.Nombre)", PrecioUnitario: @producto.PrecioUnitario}@(i < productosLista.Count - 1 ? "," : "")
+                }
+            }
+        ];
+        
+        console.log('Productos cargados:', productos);
+
+        function agregarProducto() {
+            console.log('agregarProducto() llamada, productos:', productos);
+            const container = document.getElementById('productosContainer');
+            const div = document.createElement('div');
+            div.className = 'row mb-3 producto-row';
+            
+            let productosOptions = '<option value="">-- Seleccione producto --</option>';
+            if (productos && productos.length > 0) {
+                console.log('Generando opciones para', productos.length, 'productos');
+                productosOptions += productos.map(p => {
+                    console.log('Procesando producto:', p);
+                    return `<option value="${p.Id}" data-precio="${p.PrecioUnitario}">${p.Nombre} (${p.PrecioUnitario}€)</option>`;
+                }).join('');
+            } else {
+                console.log('No hay productos disponibles o productos es:', productos);
+            }
+            
+            div.innerHTML = `
+                <div class="col-md-4">
+                    <select name="ProductoIds" class="form-select" onchange="actualizarPrecio(this, ${contadorProductos})">
+                        ${productosOptions}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input name="Cantidades" type="number" class="form-control" placeholder="Cantidad" min="1" value="1" onchange="calcularSubtotal(${contadorProductos})" />
+                </div>
+                <div class="col-md-3">
+                    <input name="PreciosUnitarios" type="number" class="form-control" placeholder="Precio" step="0.01" min="0" readonly />
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control subtotal-producto" readonly placeholder="Subtotal" />
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarProducto(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+            contadorProductos++;
+        }
+
+        function actualizarPrecio(select, index) {
+            const option = select.options[select.selectedIndex];
+            const precio = option.getAttribute('data-precio') || 0;
+            const precioInput = select.closest('.row').querySelector('input[name="PreciosUnitarios"]');
+            precioInput.value = precio;
+            calcularSubtotal(index);
+        }
+
+        function calcularSubtotal(index) {
+            const rows = document.querySelectorAll('.producto-row');
+            if (!rows[index]) return;
+
+            const cantidad = rows[index].querySelector('input[name="Cantidades"]').value || 0;
+            const precio = rows[index].querySelector('input[name="PreciosUnitarios"]').value || 0;
+            const subtotal = cantidad * precio;
+            
+            rows[index].querySelector('.subtotal-producto').value = subtotal.toFixed(2) + ' €';
+            calcularTotales();
+        }
+
+        function calcularTotales() {
+            let subtotal = 0;
+            document.querySelectorAll('.subtotal-producto').forEach(input => {
+                const valor = parseFloat(input.value.replace(' €', '')) || 0;
+                subtotal += valor;
+            });
+
+            const irpfPorcentaje = 15;
+            const ivaPorcentaje = parseFloat(document.querySelector('input[name="IVA"]').value) || 0;
+            
+            const irpfImporte = subtotal * (irpfPorcentaje / 100);
+            const ivaImporte = subtotal * (ivaPorcentaje / 100);
+            const total = subtotal - irpfImporte + ivaImporte;
+
+            document.getElementById('subtotalDisplay').textContent = subtotal.toFixed(2) + ' €';
+            document.getElementById('irpfDisplay').textContent = irpfImporte.toFixed(2) + ' €';
+            document.getElementById('ivaDisplay').textContent = ivaImporte.toFixed(2) + ' €';
+            document.getElementById('totalDisplay').textContent = total.toFixed(2) + ' €';
+            
+            // Actualizar campos hidden
+            document.getElementById('hiddenSubtotal').value = subtotal.toFixed(2);
+            document.getElementById('hiddenTotal').value = total.toFixed(2);
+        }
+
+        function eliminarProducto(button) {
+            button.closest('.producto-row').remove();
+            calcularTotales();
+        }
+
+        // Calcular totales al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            calcularTotales();
+        });
+    </script>
+}

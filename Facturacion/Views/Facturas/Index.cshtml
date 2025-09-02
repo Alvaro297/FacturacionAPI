@@ -1,0 +1,141 @@
+@model IEnumerable<Facturacion.Models.Entities.Factura>
+
+@{
+    ViewData["Title"] = "Facturas";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4><i class="fas fa-file-invoice-dollar"></i> Gestión de Facturas</h4>
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Nueva Factura
+                        </a>
+                    </div>
+                    
+                    <!-- Controles de filtrado y ordenamiento -->
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" name="searchTerm" value="@ViewBag.CurrentFilter" 
+                                       class="form-control" placeholder="Buscar facturas...">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="fechaInicio" value="@ViewBag.FechaInicio" 
+                                   class="form-control" placeholder="Fecha inicio">
+                        </div>
+                        <div class="col-md-2">
+                            <input type="date" name="fechaFin" value="@ViewBag.FechaFin" 
+                                   class="form-control" placeholder="Fecha fin">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sortBy" class="form-select">
+                                <option value="">Ordenar por...</option>
+                                <option value="numero" selected="@(ViewBag.CurrentSort == "numero")">Número</option>
+                                <option value="fecha" selected="@(ViewBag.CurrentSort == "fecha")">Fecha</option>
+                                <option value="cliente" selected="@(ViewBag.CurrentSort == "cliente")">Cliente</option>
+                                <option value="total" selected="@(ViewBag.CurrentSort == "total")">Total</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sortOrder" class="form-select">
+                                <option value="asc" selected="@(ViewBag.CurrentOrder != "desc")">Ascendente</option>
+                                <option value="desc" selected="@(ViewBag.CurrentOrder == "desc")">Descendente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-invoice-dollar fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay facturas registradas</h5>
+                            <p class="text-muted">Comience creando su primera factura.</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Primera Factura
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Número</th>
+                                        <th>Fecha</th>
+                                        <th>Cliente</th>
+                                        <th>Subtotal</th>
+                                        <th>IRPF</th>
+                                        <th>IVA</th>
+                                        <th>Total</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong class="text-primary">@Html.DisplayFor(modelItem => item.NumeroFactura)</strong>
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Fecha)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Cliente.Nombre) @Html.DisplayFor(modelItem => item.Cliente.Apellido)
+                                            </td>
+                                            <td>
+                                                <span class="text-info">@Html.DisplayFor(modelItem => item.Subtotal) €</span>
+                                            </td>
+                                            <td>
+                                                <span class="text-warning">@Html.DisplayFor(modelItem => item.IRPF)%</span>
+                                            </td>
+                                            <td>
+                                                @if (item.IVA > 0)
+                                                {
+                                                    <span class="text-secondary">@Html.DisplayFor(modelItem => item.IVA)%</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">No aplicado</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                <strong class="text-success fs-5">@Html.DisplayFor(modelItem => item.Total) €</strong>
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

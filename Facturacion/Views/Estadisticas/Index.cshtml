@@ -1,0 +1,201 @@
+@model Facturacion.Models.ViewModels.EstadisticasViewModel
+
+@{
+    ViewData["Title"] = "Estadísticas de Facturación";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-chart-bar"></i> Estadísticas de Facturación</h2>
+                
+                <!-- Selector de año -->
+                <div class="d-flex align-items-center">
+                    <label class="me-2">Año:</label>
+                    <select class="form-select" style="width: auto;" onchange="cambiarAño(this.value)">
+                        @foreach (var año in Model.AñosDisponibles)
+                        {
+                            if (año == Model.Año)
+                            {
+                                <option value="@año" selected>@año</option>
+                            }
+                            else
+                            {
+                                <option value="@año">@año</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resumen del año -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h5><i class="fas fa-euro-sign"></i> Total Facturado</h5>
+                            <h3>@Model.TotalAño.ToString("C")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <h5><i class="fas fa-file-invoice"></i> Total Facturas</h5>
+                            <h3>@Model.TotalFacturas</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <h5><i class="fas fa-calculator"></i> Promedio Mensual</h5>
+                            <h3>@Model.PromedioMensual.ToString("C")</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h5><i class="fas fa-crown"></i> Mejor Mes</h5>
+                            <h6>@Model.MesMayorFacturacion</h6>
+                            <h5>@Model.MayorFacturacionMes.ToString("C")</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráfico y tabla -->
+            <div class="row">
+                <!-- Gráfico -->
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-line"></i> Evolución Mensual de Facturación @Model.Año</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="facturacionChart" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de datos -->
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-table"></i> Datos Detallados</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-sm mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Mes</th>
+                                            <th class="text-end">Facturas</th>
+                                            <th class="text-end">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var mes in Model.FacturacionMensual)
+                                        {
+                                            <tr class="@(mes.TotalFacturado > 0 ? "" : "text-muted")">
+                                                <td>@mes.NombreMes</td>
+                                                <td class="text-end">@mes.CantidadFacturas</td>
+                                                <td class="text-end">@mes.TotalFacturado.ToString("C")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot class="table-secondary">
+                                        <tr>
+                                            <th>Total</th>
+                                            <th class="text-end">@Model.TotalFacturas</th>
+                                            <th class="text-end">@Model.TotalAño.ToString("C")</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla detallada móvil -->
+            <div class="row mt-4 d-lg-none">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-list"></i> Detalle por Mes</h5>
+                        </div>
+                        <div class="card-body">
+                            @foreach (var mes in Model.FacturacionMensual.Where(m => m.TotalFacturado > 0))
+                            {
+                                <div class="row border-bottom pb-2 mb-2">
+                                    <div class="col-6">
+                                        <strong>@mes.NombreMes</strong>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <div>@mes.CantidadFacturas facturas</div>
+                                        <div class="text-success">@mes.TotalFacturado.ToString("C")</div>
+                                        <small class="text-muted">Promedio: @mes.PromedioFactura.ToString("C")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('facturacionChart').getContext('2d');
+        const facturacionData = {
+            labels: [@Html.Raw(string.Join(",", Model.FacturacionMensual.Select(m => $"'{m.NombreMes}'")))],
+            datasets: [{
+                label: 'Facturación Mensual (€)',
+                data: [@string.Join(",", Model.FacturacionMensual.Select(m => m.TotalFacturado.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)))],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        };
+
+        const facturacionChart = new Chart(ctx, {
+            type: 'line',
+            data: facturacionData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + 
+                                       context.parsed.y.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' });
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        function cambiarAño(año) {
+            window.location.href = '@Url.Action("Index")?año=' + año;
+        }
+    </script>
+}

@@ -1,0 +1,125 @@
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4">
+            <i class="fas fa-file-invoice-dollar"></i>
+            Sistema de Facturación Profesional
+        </h1>
+        <p class="lead">
+            Gestiona tus facturas, clientes y productos de manera profesional y eficiente
+        </p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card module-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h5 class="card-title">Clientes</h5>
+                    <p class="card-text">Gestiona tu base de datos de clientes con información completa y validada.</p>
+                    <a href="@Url.Action("Index", "Clientes")" class="btn btn-primary">
+                        <i class="fas fa-arrow-right"></i> Acceder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card module-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h5 class="card-title">Productos</h5>
+                    <p class="card-text">Administra tu catálogo de productos y servicios con categorías organizadas.</p>
+                    <a href="@Url.Action("Index", "Productos")" class="btn btn-success">
+                        <i class="fas fa-arrow-right"></i> Acceder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card module-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h5 class="card-title">Facturas</h5>
+                    <p class="card-text">Crea y gestiona facturas con cálculos automáticos de IRPF e IVA para España.</p>
+                    <a href="@Url.Action("Index", "Facturas")" class="btn btn-warning">
+                        <i class="fas fa-arrow-right"></i> Acceder
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card module-card">
+                <div class="card-body">
+                    <div class="icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <h5 class="card-title">Categorías</h5>
+                    <p class="card-text">Organiza tus productos en categorías para una mejor gestión y búsqueda.</p>
+                    <a href="@Url.Action("Index", "Categorias")" class="btn btn-info">
+                        <i class="fas fa-arrow-right"></i> Acceder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-chart-line"></i> Características Principales</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Gestión completa de clientes</strong> con NIF/CIF
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Catálogo de productos</strong> organizados por categorías
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Facturación automática</strong> con numeración secuencial
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Cálculo automático</strong> de IRPF (15%) e IVA
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Diseño responsivo</strong> y profesional
+                                </li>
+                                <li class="mb-2">
+                                    <i class="fas fa-check-circle text-success"></i>
+                                    <strong>Validaciones</strong> según normativa española
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

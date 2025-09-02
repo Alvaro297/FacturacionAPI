@@ -1,0 +1,104 @@
+@model Facturacion.Models.Entities.Factura
+
+@{
+    ViewData["Title"] = "Eliminar Factura";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación de Factura</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning"></i>
+                        <strong>¿Está seguro que desea eliminar esta factura?</strong>
+                        <br>Esta acción eliminará permanentemente la factura y todos sus detalles. No se puede deshacer.
+                    </div>
+                    
+                    <!-- Información de la factura -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-file-invoice-dollar"></i> Información de la Factura</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Número:</dt>
+                                <dd class="col-sm-7"><strong class="text-primary">@Html.DisplayFor(model => model.NumeroFactura)</strong></dd>
+                                
+                                <dt class="col-sm-5">Fecha:</dt>
+                                <dd class="col-sm-7">@Html.DisplayFor(model => model.Fecha)</dd>
+                                
+                                <dt class="col-sm-5">Cliente:</dt>
+                                <dd class="col-sm-7">@Html.DisplayFor(model => model.Cliente.Nombre) @Html.DisplayFor(model => model.Cliente.Apellido)</dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calculator"></i> Totales</h6>
+                            <dl class="row">
+                                <dt class="col-sm-5">Subtotal:</dt>
+                                <dd class="col-sm-7">@Html.DisplayFor(model => model.Subtotal) €</dd>
+                                
+                                <dt class="col-sm-5">IRPF (15%):</dt>
+                                <dd class="col-sm-7 text-warning">-@((Model.Subtotal * (Model.IRPF / 100)).ToString("F2")) €</dd>
+                                
+                                @if (Model.IVA > 0)
+                                {
+                                    <dt class="col-sm-5">IVA (@Model.IVA%):</dt>
+                                    <dd class="col-sm-7 text-info">+@((Model.Subtotal * (Model.IVA / 100)).ToString("F2")) €</dd>
+                                }
+                                
+                                <dt class="col-sm-5"><strong>TOTAL:</strong></dt>
+                                <dd class="col-sm-7"><strong class="text-success">@Html.DisplayFor(model => model.Total) €</strong></dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de productos -->
+                    <h6><i class="fas fa-shopping-cart"></i> Productos/Servicios (@Model.FacturaDetalles.Count items)</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Precio Unit.</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detalle in Model.FacturaDetalles)
+                                {
+                                    <tr>
+                                        <td>@Html.DisplayFor(modelItem => detalle.Producto.Nombre)</td>
+                                        <td class="text-center">@Html.DisplayFor(modelItem => detalle.Cantidad)</td>
+                                        <td class="text-end">@Html.DisplayFor(modelItem => detalle.PrecioUnitario) €</td>
+                                        <td class="text-end">@Html.DisplayFor(modelItem => detalle.Subtotal) €</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(Model.Observaciones))
+                    {
+                        <h6><i class="fas fa-sticky-note"></i> Observaciones</h6>
+                        <p class="text-muted">@Html.DisplayFor(model => model.Observaciones)</p>
+                    }
+                    
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

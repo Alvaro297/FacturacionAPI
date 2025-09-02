@@ -1,0 +1,145 @@
+@model IEnumerable<Facturacion.Models.Entities.Producto>
+
+@{
+    ViewData["Title"] = "Productos";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4><i class="fas fa-box"></i> Gestión de Productos</h4>
+                        <a asp-action="Create" class="btn btn-success">
+                            <i class="fas fa-plus"></i> Nuevo Producto
+                        </a>
+                    </div>
+                    
+                    <!-- Controles de filtrado y ordenamiento -->
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                <input type="text" name="searchTerm" value="@ViewBag.CurrentFilter" 
+                                       class="form-control" placeholder="Buscar productos...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select name="categoriaId" class="form-select">
+                                <option value="">Todas las categorías</option>
+                                @if (ViewBag.Categorias != null)
+                                {
+                                    @foreach (SelectListItem categoria in ViewBag.Categorias)
+                                    {
+                                        <option value="@categoria.Value" selected="@(categoria.Value == ViewBag.CurrentCategoria?.ToString())">
+                                            @categoria.Text
+                                        </option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sortBy" class="form-select">
+                                <option value="">Ordenar por...</option>
+                                <option value="nombre" selected="@(ViewBag.CurrentSort == "nombre")">Nombre</option>
+                                <option value="categoria" selected="@(ViewBag.CurrentSort == "categoria")">Categoría</option>
+                                <option value="precio" selected="@(ViewBag.CurrentSort == "precio")">Precio</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sortOrder" class="form-select">
+                                <option value="asc" selected="@(ViewBag.CurrentOrder != "desc")">Ascendente</option>
+                                <option value="desc" selected="@(ViewBag.CurrentOrder == "desc")">Descendente</option>
+                            </select>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No hay productos registrados</h5>
+                            <p class="text-muted">Comience agregando su primer producto o servicio.</p>
+                            <a asp-action="Create" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Primer Producto
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Categoría</th>
+                                        <th>Precio Unitario</th>
+                                        <th>Descripción</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <strong>@Html.DisplayFor(modelItem => item.Nombre)</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">
+                                                    <i class="fas fa-tag"></i> @Html.DisplayFor(modelItem => item.Categoria.Nombre)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-bold text-success">
+                                                    @Html.DisplayFor(modelItem => item.PrecioUnitario) €
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(item.Descripcion))
+                                                {
+                                                    @if (item.Descripcion.Length > 50)
+                                                    {
+                                                        @Html.Raw(item.Descripcion.Substring(0, 50) + "...")
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.DisplayFor(modelItem => item.Descripcion)
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <em class="text-muted">Sin descripción</em>
+                                                }
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="btn-group" role="group">
+                                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+@model Facturacion.Models.Entities.Cliente
+
+@{
+    ViewData["Title"] = "Eliminar Cliente";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Confirmar Eliminación</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-warning"></i>
+                        <strong>¿Está seguro que desea eliminar este cliente?</strong>
+                        <br>Esta acción no se puede deshacer y se eliminarán todas las facturas asociadas.
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <dl class="row">
+                                <dt class="col-sm-4">Nombre Completo</dt>
+                                <dd class="col-sm-8">
+                                    <strong>@Html.DisplayFor(model => model.Nombre) @Html.DisplayFor(model => model.Apellido)</strong>
+                                </dd>
+                                
+                                <dt class="col-sm-4">Identificación</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.NIF))
+                                    {
+                                        <span class="badge bg-primary me-2">NIF: @Html.DisplayFor(model => model.NIF)</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.CIF))
+                                    {
+                                        <span class="badge bg-info">CIF: @Html.DisplayFor(model => model.CIF)</span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-4">Email</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Email)</dd>
+                                
+                                <dt class="col-sm-4">Teléfono</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Telefono))
+                                    {
+                                        @Html.DisplayFor(model => model.Telefono)
+                                    }
+                                    else
+                                    {
+                                        <em class="text-muted">No disponible</em>
+                                    }
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="Id" />
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a asp-action="Index" class="btn btn-secondary me-md-2">
+                                <i class="fas fa-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Confirmar Eliminación
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,177 @@
+@model Facturacion.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Resumen General";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard - Resumen General</h2>
+            
+            <!-- KPIs principales -->
+            <div class="row mb-4">
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title">Total Facturas</h6>
+                                    <h3 class="mb-0">@Model.TotalFacturas</h3>
+                                </div>
+                                <div class="text-end">
+                                    <i class="fas fa-file-invoice fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title">Total Facturado</h6>
+                                    <h3 class="mb-0">@Model.TotalFacturado.ToString("C")</h3>
+                                </div>
+                                <div class="text-end">
+                                    <i class="fas fa-euro-sign fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title">Total Clientes</h6>
+                                    <h3 class="mb-0">@Model.TotalClientes</h3>
+                                </div>
+                                <div class="text-end">
+                                    <i class="fas fa-users fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-lg-3 mb-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-grow-1">
+                                    <h6 class="card-title">Promedio Factura</h6>
+                                    <h3 class="mb-0">@Model.FacturaPromedio.ToString("C")</h3>
+                                </div>
+                                <div class="text-end">
+                                    <i class="fas fa-calculator fa-2x opacity-75"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas facturas -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history"></i> Últimas Facturas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>N° Factura</th>
+                                            <th>Cliente</th>
+                                            <th>Fecha</th>
+                                            <th class="text-end">Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if (Model.UltimasFacturas != null && Model.UltimasFacturas.Any())
+                                        {
+                                            @foreach (var factura in Model.UltimasFacturas)
+                                            {
+                                                <tr>
+                                                    <td>@factura.NumeroFactura</td>
+                                                    <td>@factura.Cliente.Nombre @factura.Cliente.Apellido</td>
+                                                    <td>@factura.Fecha.ToString("dd/MM/yyyy")</td>
+                                                    <td class="text-end">@factura.Total.ToString("C")</td>
+                                                    <td>
+                                                        <a asp-controller="Facturas" asp-action="Details" asp-route-id="@factura.Id" 
+                                                           class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">
+                                                    <i class="fas fa-info-circle"></i> No hay facturas registradas aún
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-pie"></i> Acciones Rápidas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a asp-controller="Facturas" asp-action="Create" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Nueva Factura
+                                </a>
+                                <a asp-controller="Clientes" asp-action="Create" class="btn btn-success">
+                                    <i class="fas fa-user-plus"></i> Nuevo Cliente
+                                </a>
+                                <a asp-controller="Productos" asp-action="Create" class="btn btn-info">
+                                    <i class="fas fa-box"></i> Nuevo Producto
+                                </a>
+                                <a asp-controller="Estadisticas" asp-action="Index" class="btn btn-warning">
+                                    <i class="fas fa-chart-bar"></i> Ver Estadísticas
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5><i class="fas fa-info-circle"></i> Información del Sistema</h5>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <div class="mb-2">
+                                    <strong>Total Productos:</strong> @Model.TotalProductos
+                                </div>
+                                <div class="mb-2">
+                                    <strong>Sistema:</strong> Facturación v1.0
+                                </div>
+                                <div>
+                                    <strong>Fecha:</strong> @DateTime.Now.ToString("dd/MM/yyyy")
+                                </div>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

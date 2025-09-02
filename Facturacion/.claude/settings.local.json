@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet add package:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(dotnet run)"
+    ],
+    "deny": []
+  }
+}

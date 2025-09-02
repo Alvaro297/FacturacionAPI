@@ -1,0 +1,173 @@
+@model Facturacion.Models.Entities.Factura
+
+@{
+    ViewData["Title"] = "Detalles de Factura";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4><i class="fas fa-file-invoice-dollar"></i> Factura @Model.NumeroFactura</h4>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <button class="btn btn-info" onclick="window.print()">
+                            <i class="fas fa-print"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Información de la factura -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-building"></i> Información de la Factura</h5>
+                            <dl class="row">
+                                <dt class="col-sm-5">Número:</dt>
+                                <dd class="col-sm-7"><strong class="text-primary">@Html.DisplayFor(model => model.NumeroFactura)</strong></dd>
+                                
+                                <dt class="col-sm-5">Fecha:</dt>
+                                <dd class="col-sm-7">@Html.DisplayFor(model => model.Fecha)</dd>
+                                
+                                @if (!string.IsNullOrEmpty(Model.FormaPago))
+                                {
+                                    <dt class="col-sm-5">Forma de Pago:</dt>
+                                    <dd class="col-sm-7">@Html.DisplayFor(model => model.FormaPago)</dd>
+                                }
+                            </dl>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> Cliente</h5>
+                            <dl class="row">
+                                <dt class="col-sm-4">Nombre:</dt>
+                                <dd class="col-sm-8"><strong>@Html.DisplayFor(model => model.Cliente.Nombre) @Html.DisplayFor(model => model.Cliente.Apellido)</strong></dd>
+                                
+                                <dt class="col-sm-4">Identificación:</dt>
+                                <dd class="col-sm-8">
+                                    @if (!string.IsNullOrEmpty(Model.Cliente.NIF))
+                                    {
+                                        <span class="badge bg-primary">NIF: @Html.DisplayFor(model => model.Cliente.NIF)</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(Model.Cliente.CIF))
+                                    {
+                                        <span class="badge bg-info">CIF: @Html.DisplayFor(model => model.Cliente.CIF)</span>
+                                    }
+                                </dd>
+                                
+                                <dt class="col-sm-4">Email:</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Cliente.Email)</dd>
+                                
+                                <dt class="col-sm-4">Dirección:</dt>
+                                <dd class="col-sm-8">@Html.DisplayFor(model => model.Cliente.Direccion)</dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <!-- Detalles de productos -->
+                    <h5><i class="fas fa-shopping-cart"></i> Detalles de Productos/Servicios</h5>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Producto/Servicio</th>
+                                    <th>Categoría</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Precio Unit.</th>
+                                    <th class="text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detalle in Model.FacturaDetalles)
+                                {
+                                    <tr>
+                                        <td>
+                                            <strong>@Html.DisplayFor(modelItem => detalle.Producto.Nombre)</strong>
+                                            @if (!string.IsNullOrEmpty(detalle.Producto.Descripcion))
+                                            {
+                                                <br><small class="text-muted">@Html.DisplayFor(modelItem => detalle.Producto.Descripcion)</small>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">@Html.DisplayFor(modelItem => detalle.Producto.Categoria.Nombre)</span>
+                                        </td>
+                                        <td class="text-center">@Html.DisplayFor(modelItem => detalle.Cantidad)</td>
+                                        <td class="text-end">@Html.DisplayFor(modelItem => detalle.PrecioUnitario) €</td>
+                                        <td class="text-end"><strong>@Html.DisplayFor(modelItem => detalle.Subtotal) €</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Totales -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if (!string.IsNullOrEmpty(Model.Observaciones))
+                            {
+                                <h6><i class="fas fa-sticky-note"></i> Observaciones</h6>
+                                <p class="text-muted">@Html.DisplayFor(model => model.Observaciones)</p>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title"><i class="fas fa-calculator"></i> Resumen de Totales</h6>
+                                    <dl class="row mb-0">
+                                        <dt class="col-sm-6">Subtotal:</dt>
+                                        <dd class="col-sm-6 text-end">@Html.DisplayFor(model => model.Subtotal) €</dd>
+                                        
+                                        <dt class="col-sm-6">IRPF (15%):</dt>
+                                        <dd class="col-sm-6 text-end text-warning">-@((Model.Subtotal * (Model.IRPF / 100)).ToString("F2")) €</dd>
+                                        
+                                        @if (Model.IVA > 0)
+                                        {
+                                            <dt class="col-sm-6">IVA (@Model.IVA%):</dt>
+                                            <dd class="col-sm-6 text-end text-info">+@((Model.Subtotal * (Model.IVA / 100)).ToString("F2")) €</dd>
+                                        }
+                                        
+                                        <hr />
+                                        <dt class="col-sm-6"><strong>TOTAL:</strong></dt>
+                                        <dd class="col-sm-6 text-end"><h5 class="text-success mb-0">@Html.DisplayFor(model => model.Total) €</h5></dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="fas fa-arrow-left"></i> Volver a la Lista
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-warning me-md-2">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@Model?.Id" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        .btn, .card-header .btn-group {
+            display: none !important;
+        }
+        
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        body {
+            background: white !important;
+        }
+    }
+</style>
