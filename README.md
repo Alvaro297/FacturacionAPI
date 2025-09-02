@@ -54,7 +54,7 @@ Sistema.Facturacion/
 
 1. **Clona el repositorio**
    ```bash
-   git clone https://github.com/tu-usuario/sistema-facturacion.git
+   git clone https://github.com/Alvaro297/FacturacionAPI
    cd sistema-facturacion
    ```
 
